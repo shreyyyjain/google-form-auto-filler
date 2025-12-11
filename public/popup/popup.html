@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GFormTasker-Clone Popup</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 400px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .container {
+      padding: 16px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .section {
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .preset-list {
+      list-style: none;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      overflow: hidden;
+      background: white;
+    }
+
+    .preset-item {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .preset-item:hover {
+      background: #f9f9f9;
+    }
+
+    .preset-item:last-child {
+      border-bottom: none;
+    }
+
+    .preset-name {
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .preset-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+      padding: 6px 8px;
+      font-size: 12px;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #d1d5db;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .progress {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 12px;
+      margin-top: 8px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #e5e7eb;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: #667eea;
+      transition: width 0.3s;
+    }
+
+    .progress-text {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 24px 16px;
+      color: #999;
+    }
+
+    .empty-state-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .logs {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 12px;
+      border-radius: 4px;
+      font-family: "Monaco", "Courier New", monospace;
+      font-size: 12px;
+      max-height: 150px;
+      overflow-y: auto;
+      margin-top: 8px;
+    }
+
+    .log-entry {
+      line-height: 1.5;
+      border-bottom: 1px solid #333;
+    }
+
+    .log-entry:last-child {
+      border-bottom: none;
+    }
+
+    .log-info {
+      color: #7ec699;
+    }
+
+    .log-warn {
+      color: #dcdcaa;
+    }
+
+    .log-error {
+      color: #f48771;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>GFormTasker-Clone</h1>
+  </div>
+
+  <div class="container">
+    <div class="section">
+      <h2 class="section-title">Presets</h2>
+      <ul id="presetList" class="preset-list">
+        <li class="empty-state">
+          <div class="empty-state-icon">📋</div>
+          <p>No presets yet. Create one in options.</p>
+        </li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="controls">
+        <button class="btn btn-primary" id="recordBtn">🔴 Record</button>
+        <button class="btn btn-primary" id="optionsBtn">⚙️ Options</button>
+      </div>
+    </div>
+
+    <div id="progressSection" class="section" style="display: none;">
+      <h2 class="section-title">Progress</h2>
+      <div class="progress">
+        <div class="progress-bar">
+          <div id="progressBar" class="progress-bar-fill" style="width: 0%"></div>
+        </div>
+        <div class="progress-text">
+          <span id="progressText">0/0 submissions</span>
+          <span id="estimatedTime"></span>
+        </div>
+        <div style="margin-top: 8px; display: flex; gap: 8px;">
+          <button class="btn btn-secondary" id="stopBtn" style="flex: 1;">Stop</button>
+          <button class="btn btn-danger" id="cancelBtn" style="flex: 1;">Cancel</button>
+        </div>
+      </div>
+
+      <div id="logsContainer" style="margin-top: 8px;">
+        <h3 class="section-title">Activity Log</h3>
+        <div class="logs" id="logs"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
