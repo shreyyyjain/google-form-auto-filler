@@ -56,47 +56,158 @@ class FormInteractor {
     // Check if we're on a Google Form
     if (!this.isGoogleForm()) return;
 
-    // Create a floating record button
-    const container = document.createElement("div");
-    container.id = "gformtasker-recorder-ui";
-    container.style.cssText = `
+    // Create a persistent floating panel
+    const panel = document.createElement("div");
+    panel.id = "gformtasker-panel";
+    panel.style.cssText = `
       position: fixed;
       bottom: 20px;
       right: 20px;
       z-index: 10000;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow: hidden;
+      width: 320px;
+      max-height: 500px;
+      display: flex;
+      flex-direction: column;
     `;
 
+    // Header with title and close button
+    const header = document.createElement("div");
+    header.style.cssText = `
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: move;
+    `;
+    header.textContent = "GFormTasker";
+    header.id = "gformtasker-header";
+
+    // Close/minimize button
+    const closeBtn = document.createElement("button");
+    closeBtn.textContent = "−";
+    closeBtn.style.cssText = `
+      background: rgba(255,255,255,0.3);
+      color: white;
+      border: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: background 0.2s;
+    `;
+    closeBtn.onmouseover = () => (closeBtn.style.background = "rgba(255,255,255,0.5)");
+    closeBtn.onmouseout = () => (closeBtn.style.background = "rgba(255,255,255,0.3)");
+    closeBtn.addEventListener("click", () => this.minimizePanel(panel));
+    header.appendChild(closeBtn);
+
+    // Content area
+    const content = document.createElement("div");
+    content.id = "gformtasker-content";
+    content.style.cssText = `
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+    `;
+
+    // Record button
     const button = document.createElement("button");
     button.id = "gformtasker-record-btn";
     button.textContent = "🔴 Record Preset";
     button.style.cssText = `
+      width: 100%;
       padding: 12px 16px;
       background: #667eea;
       color: white;
       border: none;
-      border-radius: 24px;
+      border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
       font-size: 14px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      margin-bottom: 8px;
       transition: all 0.2s;
     `;
-
     button.onmouseover = () => {
       button.style.background = "#5568d3";
-      button.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
+      button.style.transform = "translateY(-1px)";
     };
-
     button.onmouseout = () => {
       button.style.background = "#667eea";
-      button.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
+      button.style.transform = "translateY(0)";
     };
-
     button.addEventListener("click", () => this.toggleRecording());
-    container.appendChild(button);
+    content.appendChild(button);
 
-    document.body.appendChild(container);
+    // Info text
+    const info = document.createElement("div");
+    info.id = "gformtasker-info";
+    info.style.cssText = `
+      font-size: 12px;
+      color: #666;
+      line-height: 1.4;
+    `;
+    info.textContent = "Record once, submit N times with randomization.";
+    content.appendChild(info);
+
+    panel.appendChild(header);
+    panel.appendChild(content);
+    document.body.appendChild(panel);
+
+    // Make header draggable
+    this.makePanelDraggable(panel, header);
+
+    // Restore panel state if minimized
+    const isMinimized = sessionStorage.getItem("gformtasker-minimized") === "true";
+    if (isMinimized) {
+      this.minimizePanel(panel);
+    }
+  }
+
+  private makePanelDraggable(panel: HTMLElement, header: HTMLElement) {
+    let offsetX = 0;
+    let offsetY = 0;
+    let isDown = false;
+
+    header.addEventListener("mousedown", (e) => {
+      isDown = true;
+      const rect = panel.getBoundingClientRect();
+      offsetX = (e as MouseEvent).clientX - rect.left;
+      offsetY = (e as MouseEvent).clientY - rect.top;
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if (!isDown) return;
+      const x = (e as MouseEvent).clientX - offsetX;
+      const y = (e as MouseEvent).clientY - offsetY;
+      panel.style.bottom = "auto";
+      panel.style.right = "auto";
+      panel.style.left = Math.max(0, Math.min(x, window.innerWidth - 320)) + "px";
+      panel.style.top = Math.max(0, Math.min(y, window.innerHeight - 100)) + "px";
+    });
+
+    document.addEventListener("mouseup", () => {
+      isDown = false;
+    });
+  }
+
+  private minimizePanel(panel: HTMLElement) {
+    const content = document.getElementById("gformtasker-content");
+    if (content) {
+      const isHidden = content.style.display === "none";
+      content.style.display = isHidden ? "block" : "none";
+      sessionStorage.setItem("gformtasker-minimized", !isHidden ? "true" : "false");
+      panel.style.width = isHidden ? "320px" : "auto";
+    }
   }
 
   private isGoogleForm(): boolean {

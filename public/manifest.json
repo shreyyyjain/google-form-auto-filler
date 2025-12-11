@@ -8,7 +8,9 @@
     "activeTab"
   ],
   "host_permissions": [
-    "https://docs.google.com/forms/*"
+    "https://docs.google.com/forms/*",
+    "http://localhost:3000/*",
+    "http://localhost:4173/*"
   ],
   "icons": {
     "48": "icons/icon-48.png",
@@ -29,7 +31,9 @@
   "content_scripts": [
     {
       "matches": [
-        "https://docs.google.com/forms/*"
+        "https://docs.google.com/forms/*",
+        "http://localhost:3000/*",
+        "http://localhost:4173/*"
       ],
       "js": [
         "content-script.js"
