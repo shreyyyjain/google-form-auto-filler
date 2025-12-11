@@ -173,7 +173,7 @@ describe("RandomizationEngine", () => {
     it("should support string expressions", () => {
       const result = RandomizationEngine.evaluateCustomExpression(
         "'prefix-' + Math.random().toString().substring(2, 5)"
-      );
+      ) as string;
       expect(typeof result).toBe("string");
       expect(result.startsWith("prefix-")).toBe(true);
     });

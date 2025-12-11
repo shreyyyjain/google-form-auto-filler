@@ -96,7 +96,7 @@ class PopupController {
           count: parseInt(count),
         },
       },
-      (response) => {
+      (response: unknown) => {
         if (chrome.runtime.lastError) {
           console.error("Failed to start submission:", chrome.runtime.lastError);
           alert(
@@ -113,14 +113,14 @@ class PopupController {
 
   private startRecording() {
     // Send message to content script to start recording
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs: chrome.tabs.Tab[]) => {
       if (tabs[0].id) {
         chrome.tabs.sendMessage(
           tabs[0].id,
           {
             type: "start_recording",
           },
-          (response) => {
+          (response: unknown) => {
             if (chrome.runtime.lastError) {
               alert(
                 "Could not start recording. Make sure you are on a Google Form."
@@ -156,13 +156,19 @@ class PopupController {
   }
 
   private listenForProgress() {
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-      if (request.type === "submission_progress") {
-        this.currentProgress = request.payload;
-        this.updateProgressUI();
+    chrome.runtime.onMessage.addListener(
+      (
+        request: { type: string; payload?: SubmissionProgress },
+        sender: chrome.runtime.MessageSender,
+        sendResponse: (response?: unknown) => void
+      ) => {
+        if (request.type === "submission_progress") {
+          this.currentProgress = request.payload ?? null;
+          this.updateProgressUI();
+        }
+        sendResponse({ received: true });
       }
-      sendResponse({ received: true });
-    });
+    );
   }
 
   private updateProgressUI() {

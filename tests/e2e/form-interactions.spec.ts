@@ -20,8 +20,8 @@ test.describe("GFormTasker-Clone E2E Tests", () => {
     const textInput = page.locator('input[data-question-id="q1"]');
     const emailInput = page.locator('input[data-question-id="q2"]');
     const textarea = page.locator('textarea[data-question-id="q3"]');
-    const radioGroup = page.locator('[data-question-id="q4"]');
-    const checkboxGroup = page.locator('[data-question-id="q5"]');
+    const radioGroup = page.locator('div.radio-group[data-question-id="q4"]');
+    const checkboxGroup = page.locator('div.checkbox-group[data-question-id="q5"]');
     const dropdown = page.locator('select[data-question-id="q6"]');
     const dateInput = page.locator('input[data-question-id="q8"]');
     const submitBtn = page.locator("button.submit-btn");

@@ -29,7 +29,12 @@ class FormInteractor {
   }
 
   private initMessageListener() {
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    chrome.runtime.onMessage.addListener(
+      (
+        request: ContentScriptMessage,
+        sender: chrome.runtime.MessageSender,
+        sendResponse: (response?: unknown) => void
+      ) => {
       console.log("Content script received:", request.type);
 
       if (request.type === "start_recording") {
@@ -177,7 +182,7 @@ class FormInteractor {
         type: "create_preset",
         payload: preset,
       },
-      (response) => {
+      (response: unknown) => {
         if (chrome.runtime.lastError) {
           console.error("Failed to save preset:", chrome.runtime.lastError);
         } else {
@@ -318,8 +323,10 @@ class FormInteractor {
       questionType === "radio" ||
       questionType === "checkbox"
     ) {
-      const options = element.querySelectorAll(
-        "label, [role='option'], [role='radio'], [role='checkbox']"
+      const options = Array.from(
+        element.querySelectorAll(
+          "label, [role='option'], [role='radio'], [role='checkbox']"
+        )
       );
       for (const opt of options) {
         if (opt.textContent?.includes(strValue)) {
@@ -328,7 +335,7 @@ class FormInteractor {
         }
       }
     } else if (questionType === "dropdown") {
-      const options = element.querySelectorAll("[role='option']");
+      const options = Array.from(element.querySelectorAll("[role='option']"));
       for (const opt of options) {
         if (opt.textContent?.includes(strValue)) {
           (opt as HTMLElement).click();

@@ -137,11 +137,12 @@ export interface ContentScriptMessage {
   type:
     | "start_recording"
     | "stop_recording"
+    | "fill_and_submit"
     | "submit_form"
     | "question_detected"
     | "answer_captured"
     | "form_ready";
-  payload?: unknown;
+  payload?: any;
 }
 
 export interface BackgroundServiceMessage {
@@ -154,5 +155,5 @@ export interface BackgroundServiceMessage {
     | "get_presets"
     | "get_progress"
     | "log_activity";
-  payload?: unknown;
+  payload?: any;
 }

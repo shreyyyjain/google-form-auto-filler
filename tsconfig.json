@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
-    "lib": ["ES2020", "DOM"],
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "moduleResolution": "bundler",
     "strict": true,
     "skipLibCheck": true,
@@ -17,7 +17,9 @@
     "paths": {
       "@/*": ["src/*"],
       "@types/*": ["src/types/*"]
-    }
+    },
+    "types": ["chrome", "node"],
+    "typeRoots": ["./node_modules/@types"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "tests"]

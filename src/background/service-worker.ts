@@ -26,7 +26,12 @@ class BackgroundService {
   }
 
   private initMessageListener() {
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    chrome.runtime.onMessage.addListener(
+      (
+        request: BackgroundServiceMessage,
+        sender: chrome.runtime.MessageSender,
+        sendResponse: (response?: unknown) => void
+      ) => {
       console.log("Service worker received:", request.type);
 
       if (request.type === "create_preset") {
@@ -53,7 +58,7 @@ class BackgroundService {
   }
 
   private initAlarmListeners() {
-    chrome.alarms.onAlarm.addListener((alarm) => {
+    chrome.alarms.onAlarm.addListener((alarm: chrome.alarms.Alarm) => {
       if (alarm.name === "submission_check") {
         this.broadcastProgress();
       }
