@@ -18,9 +18,6 @@ if (fs.existsSync(publicDir)) {
 
 const buildConfig = {
   entryPoints: {
-    background: "src/background/service-worker.ts",
-    "popup/popup": "src/popup/popup.ts",
-    "options/options": "src/options/options.ts",
     "content-script": "src/content-scripts/injector.ts",
   },
   bundle: true,
